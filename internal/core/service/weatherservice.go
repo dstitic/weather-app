@@ -17,17 +17,20 @@ func NewWeatherService(api ports.WeatherAPI, repo ports.WeatherRepository) *Weat
 func (s *WeatherService) GetWeather(city string) (*domain.Weather, error) {
 	weather, err := s.repo.GetWeather(city)
 	if err == nil {
+err = s.repo.SaveWeather(weather)
+	if err != nil {
+		return nil, err
+	}
 		return weather, nil
 	}
+
+
 	weather, err = s.api.FetchWeather(city)
 	if err != nil {
-		return nil, err
+		return weather, err
 	}
 
-	err = s.repo.SaveWeather(weather)
-	if err != nil {
-		return nil, err
-	}
+	
 
 	return weather, nil
 }
